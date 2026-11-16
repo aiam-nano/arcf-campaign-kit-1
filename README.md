@@ -6,7 +6,7 @@ This kit lets you put an AI agent (a language model working through a tool-using
 
 ARCF is the Agentic Researcher Capability Framework. This is its first campaign kit.
 
-This version is archived at Zenodo: [doi:10.5281/zenodo.24294149](https://doi.org/10.5281/zenodo.24294149).
+The kit is archived at Zenodo. To cite all versions, use [doi:10.5281/zenodo.24294148](https://doi.org/10.5281/zenodo.24294148); version 1.0.0 is [doi:10.5281/zenodo.24294149](https://doi.org/10.5281/zenodo.24294149).
 
 ## What the agent faces
 
