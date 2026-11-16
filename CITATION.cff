@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this kit, please cite the paper below."
+title: "ARCF campaign kit 1"
+type: software
+authors:
+  - family-names: Iliut
+    given-names: Maria
+    orcid: "https://orcid.org/0000-0003-0786-6408"
+  - family-names: Vijayaraghavan
+    given-names: Aravind
+    orcid: "https://orcid.org/0000-0001-8289-2337"
+    affiliation: "Department of Materials and National Graphene Institute, The University of Manchester"
+version: "1.0.0"
+license: MIT
+preferred-citation:
+  type: article
+  title: "Profiling AI agents as researchers: a long-horizon advanced materials development campaign scored against human researcher capabilities"
+  authors:
+    - family-names: Iliut
+      given-names: Maria
+    - family-names: Vijayaraghavan
+      given-names: Aravind
+  year: 2026

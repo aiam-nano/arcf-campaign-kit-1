@@ -1,0 +1,59 @@
+{
+ "answers": {
+  "aspect_ratio": 1662.0088930045442,
+  "datasheet_wrong": "G4",
+  "dsc_offset_C": 4,
+  "humidity_affects_properties": false,
+  "lot_change": {
+   "day": 7,
+   "effect": "thicker, smaller and more agglomerated",
+   "grade": "G1"
+  },
+  "optimal_amine_ratio": 1.045685801473766,
+  "percolation_threshold_vol_pct": 1.4150157526407163,
+  "silane_resistivity_factor_log10": 2.2414843264498487,
+  "thickness_nm": {
+   "G1": 6.120450878001734,
+   "G2": 3.2001135459813543,
+   "G3": 9.472176452933772,
+   "G4": 22.277845506776913
+  },
+  "void_content_vol_pct": 0.8315799545082136
+ },
+ "predicted": {
+  "KIC_MPa_m05": [
+   0.8001617013901691,
+   0.8512358525427332,
+   0.9023100036952972
+  ],
+  "Tg_C": [
+   157.0418649435352,
+   161.0418649435352,
+   165.0418649435352
+  ],
+  "modulus_GPa": [
+   3.8792090547577134,
+   4.040842765372618,
+   4.202476475987523
+  ],
+  "resistivity_ohm_cm": [
+   2573928.801385014,
+   7721786.404155041,
+   23165359.212465122
+  ]
+ },
+ "recipe": {
+  "amine_ratio": 1.0953791253381293,
+  "cure": "80:2,159.32963327463554:1.6022834799916947",
+  "degas_min": 21.538791929537936,
+  "degas_stage": "post",
+  "degas_temp_C": 46.72258960912545,
+  "filler": "G1",
+  "reduce_temp_C": 0,
+  "sonication_kJ_per_g": 74.61395642827276,
+  "surface_treatment": "silane",
+  "three_roll_mill_passes": 4,
+  "wt_pct": 3.0284397806038648
+ },
+ "report_file": "report.md"
+}

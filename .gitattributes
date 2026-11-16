@@ -1,0 +1,6 @@
+*.key binary
+agent_kit/bin/** binary
+scorer/** binary
+*.py text eol=lf
+*.md text
+*.json text

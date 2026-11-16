@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+runs/
+*_score.json
+*_audit.md
+*_manual.md
+*_capability.json
+*_capability.md
+8_raw_data_compiled.txt

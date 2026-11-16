@@ -1,0 +1,189 @@
+{
+  "Seed": 10,
+  "Campaign": "B",
+  "Grades": [
+    {
+      "Name": "G1",
+      "Role": "solid",
+      "Lots": [
+        {
+          "ID": "23-0468",
+          "L0": 9.02753103744332,
+          "T0": 9.471577697938292,
+          "A0": 0.4808369579666896
+        }
+      ],
+      "Sigma0": 1090.9714283764627,
+      "OFrac": 0.022233398442358093,
+      "Price": 151,
+      "Density": 2.2,
+      "DS": {
+        "Supplier": "Pennine Nanomaterials",
+        "Product": "PE-M71",
+        "LateralUm": 9,
+        "ThicknessNm": 9,
+        "SSA": 91,
+        "CarbonPct": 98,
+        "Density": 2.2,
+        "PriceGBPkg": 151,
+        "Notes": "Typical values."
+      },
+      "IsGO": false,
+      "Fmin": 0
+    },
+    {
+      "Name": "G2",
+      "Role": "premium",
+      "Lots": [
+        {
+          "ID": "24-0371",
+          "L0": 24.257149708285223,
+          "T0": 3.419495576325022,
+          "A0": 0.40125168580497156
+        }
+      ],
+      "Sigma0": 2924.5767184657584,
+      "OFrac": 0.01571924509106266,
+      "Price": 736,
+      "Density": 2.2,
+      "DS": {
+        "Supplier": "Northgate Carbon",
+        "Product": "NO-I50",
+        "LateralUm": 24,
+        "ThicknessNm": 3.4,
+        "SSA": 253,
+        "CarbonPct": 99.2,
+        "Density": 2.2,
+        "PriceGBPkg": 736,
+        "Notes": "Premium few-layer grade."
+      },
+      "IsGO": false,
+      "Fmin": 0
+    },
+    {
+      "Name": "G3",
+      "Role": "liar",
+      "Lots": [
+        {
+          "ID": "23-0625",
+          "L0": 18.15843932033911,
+          "T0": 30.35945547252151,
+          "A0": 0.5958107381572298
+        }
+      ],
+      "Sigma0": 2862.065409647976,
+      "OFrac": 0.01673451918837383,
+      "Price": 91,
+      "Density": 2.2,
+      "DS": {
+        "Supplier": "Atlas Graphite Ltd",
+        "Product": "AT-K84",
+        "LateralUm": 25,
+        "ThicknessNm": 2,
+        "SSA": 409,
+        "CarbonPct": 99,
+        "Density": 2.2,
+        "PriceGBPkg": 91,
+        "Notes": "Few-layer graphene. 'Up to' values quoted for lateral size and thickness."
+      },
+      "IsGO": false,
+      "Fmin": 0.7874274200308901
+    },
+    {
+      "Name": "G4",
+      "Role": "hero",
+      "Lots": [
+        {
+          "ID": "24-0523",
+          "L0": 16.989050134219053,
+          "T0": 5.230434388818562,
+          "A0": 0.4235273949797781
+        },
+        {
+          "ID": "25-0680",
+          "L0": 14.321071409266192,
+          "T0": 7.479998824528498,
+          "A0": 0.5529991183094659
+        }
+      ],
+      "Sigma0": 963.462935410811,
+      "OFrac": 0.027856158882581066,
+      "Price": 213,
+      "Density": 2.2,
+      "DS": {
+        "Supplier": "Meridian 2D",
+        "Product": "ME-R55",
+        "LateralUm": 17,
+        "ThicknessNm": 5.2,
+        "SSA": 182,
+        "CarbonPct": 97.5,
+        "Density": 2.2,
+        "PriceGBPkg": 213,
+        "Notes": "Average values; lot-to-lot variation within ±15%."
+      },
+      "IsGO": false,
+      "Fmin": 0
+    },
+    {
+      "Name": "GO",
+      "Role": "go",
+      "Lots": [
+        {
+          "ID": "GO-561",
+          "L0": 3.121731059506085,
+          "T0": 1.5945654786221475,
+          "A0": 0.22168349323826445
+        }
+      ],
+      "Sigma0": 0,
+      "OFrac": 0,
+      "Price": 301,
+      "Density": 2,
+      "DS": {
+        "Supplier": "In-house (modified Hummers)",
+        "Product": "GO-HM",
+        "LateralUm": 3.1,
+        "ThicknessNm": 1,
+        "SSA": 0,
+        "CarbonPct": 0,
+        "Density": 2,
+        "PriceGBPkg": 301,
+        "Notes": "Freeze-dried graphene oxide; must be thermally reduced in-house before use (--reduce, 150-1000 C). C/O about 2.1 as made."
+      },
+      "IsGO": true,
+      "Fmin": 0
+    }
+  ],
+  "Ex": 95.72390233627468,
+  "Ef": 182.4915847570528,
+  "Ea": 110.19892297618821,
+  "Fmin": 0.5526856164397232,
+  "EfEff": 289.5548617906981,
+  "EtaO": 0.5333333333333333,
+  "EtaI": {
+    "dispersant": 0.047932116345054704,
+    "none": 0.0688425610845855,
+    "silane": 0.13030193805874707
+  },
+  "EtaIGO": {
+    "dispersant": 0.10517055163572787,
+    "none": 0.10226759454295911,
+    "silane": 0.15810798446701513
+  },
+  "Kappa": 3.546358374246349,
+  "Cp": 0.49242825822655106,
+  "CpGO": 0.3226863849534311,
+  "CR": 0.5643390889280531,
+  "ContactMult": {
+    "dispersant": 0.07641437265813636,
+    "none": 1,
+    "silane": 0.0021912698272389397
+  },
+  "LotDay": 6,
+  "LotGrade": 3,
+  "DSCDay": 14,
+  "DSCOffset": 5.9,
+  "Rc2Lo": 3000,
+  "Rc2Hi": 30000,
+  "HumBase": 37.53546487609074
+}
