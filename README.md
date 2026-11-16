@@ -6,6 +6,8 @@ This kit lets you put an AI agent (a language model working through a tool-using
 
 ARCF is the Agentic Researcher Capability Framework. This is its first campaign kit.
 
+This version is archived at Zenodo: [doi:10.5281/zenodo.24294149](https://doi.org/10.5281/zenodo.24294149).
+
 ## What the agent faces
 
 The agent is told it is the lead materials scientist at a company that needs a graphene-filled epoxy for electrostatic-dissipative instrument housings. It has a virtual laboratory (`vlab`), a handbook, a budget of 1,800 credits and about four simulated weeks. It chooses fillers, dispersion, surface treatment, amine ratio, degassing and cure, makes batches and runs twelve kinds of instrument. Every instrument returns raw data only, so the agent reduces everything itself. The formulation must meet a five-part specification in production, which starts on day 20 with whatever stock is then in store.
