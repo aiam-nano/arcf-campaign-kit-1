@@ -27,6 +27,7 @@ In the paper a run took the agent between 9 and 93 minutes of wall-clock time an
 | `grading/` | The rubric for the six manually graded items, the grader prompts, and a helper that compiles raw data for the grader |
 | `tools/` | Python tools: `new_run.py` (sets up a run folder), `capability_score.py` (the nine-capability profile), `audit_transcript.py` (checks a harness transcript for rule breaches), `baselines.py` (random-search and Bayesian-optimisation agents), `plot_trajectory.py` (draws a run's campaign timeline) and `ref_analysis.py` (reference data reduction) |
 | `results/` | The results of the 17 runs reported in the paper, for comparison |
+| `analysis/` | The scripts that reproduce the paper's statistics, sensitivity analysis, costs and figures from the published run records (see `analysis/README.md`) |
 
 The programs are in one folder per platform, in both `agent_kit/bin/` and `scorer/`:
 

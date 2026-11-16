@@ -10,11 +10,11 @@ The non-LLM baselines, given the same budget and interface on campaigns A–C, m
 
 | System (model, harness) | Runs | A | B | C | Capability score, mean [90% interval] |
 | --- | --- | --- | --- | --- | --- |
-| Fable 5.2 (Claude Code) | 3 | 87.0 | 85.2 | 98.1 | 90.1 [83.1–96.2] |
-| Carbon (Antigravity) | 3 | 77.8 | 87.0 | 88.9 | 84.6 [77.8–90.9] |
+| Fable 5.2 (Claude Code) | 3 | 87.0 | 85.2 | 98.1 | 90.1 [83.2–96.2] |
+| Carbon (Antigravity) | 3 | 77.8 | 87.0 | 88.9 | 84.6 [77.8–91.0] |
 | Opus 5.5 (Antigravity) | 4 | 81.4 | 88.9 | 77.8 | 82.7 [77.0–88.8] |
-| Opus 5.5 (Claude Code) | 4 | 76.8 | 81.5 | 75.9 | 78.1 [72.8–83.3] |
-| Hydrogen (Antigravity) | 3 | 75.9 | 81.5 | 72.2 | 76.5 [70.5–82.6] |
+| Opus 5.5 (Claude Code) | 4 | 76.8 | 81.5 | 75.9 | 78.1 [72.9–83.3] |
+| Hydrogen (Antigravity) | 3 | 75.9 | 81.5 | 72.2 | 76.5 [70.5–82.5] |
 
 **Table 2** Results of every run. Capability scores are fractions of criteria met (Del., project delivery; Des., experimental design; Src., source scrutiny; Ana., data analysis; Meas., measurement judgement; Chg., response to change; Ins., scientific insight; Res., resource management; Rep., honest reporting). CC, Claude Code; AG, Antigravity.
 

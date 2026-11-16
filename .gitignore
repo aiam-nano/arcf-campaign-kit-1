@@ -7,3 +7,4 @@ runs/
 *_capability.json
 *_capability.md
 8_raw_data_compiled.txt
+analysis/out/

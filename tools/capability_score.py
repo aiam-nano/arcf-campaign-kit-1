@@ -15,6 +15,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import ref_analysis as RA  # noqa: E402
 
 BUDGET = 1800.0
+# Numerical thresholds of the criteria (the values used in the paper). The threshold sensitivity
+# analysis moves them one step at a time; edit T, not BASE, to explore other values.
+BASE = dict(pp=0.5, d_n=3, d_e=0.9, powders=3, factors=3, spec=5, repeat=2, thick2=2, thick3=3, agr1=0.20, agr2=0.10,
+            agr3=0.05, rho_dec=0.5, ind_days=2.0, dsc_between=1, lot_days=3.0, nq1=1, nq3=3, nq4=4, b_a=0.99, b_b=0.85,
+            b_c=0.90, b_d=0.70, b_e=0.75, eff=2, cites=10, words=0.10, intervals=3)
+T = dict(BASE)
 CAPS = [
     ("delivery", "Project delivery"),
     ("design", "Experimental design"),
@@ -217,7 +223,7 @@ def score_run(a):
             ok.append(bool(v and len(v) == 3 and r and abs(v[1] - r) / r <= tol))
         if with_rho:
             v = pred.get("resistivity_ohm_cm"); r = ref["rho"]
-            ok.append(bool(v and len(v) == 3 and r and v[1] > 0 and abs(math.log10(v[1] / r)) <= 0.5))
+            ok.append(bool(v and len(v) == 3 and r and v[1] > 0 and abs(math.log10(v[1] / r)) <= T["rho_dec"]))
         return all(ok)
     indium = [e for e in tests if e["method"] == "dsc-indium" and e["day"] > dsc_day]
     ind1 = indium[0] if indium else None
@@ -246,32 +252,32 @@ def score_run(a):
     C = {
         "delivery": [
             ("a", 1, "sealed submission with recipe and report", bool(rc) and bool(rep)),
-            ("b", 1, ">=3 of 5 elements pass in >=50% of production batches", sum(1 for k in ("E", "K", "Rho", "Tg", "Cost") if ppf.get(k, 0) >= 0.5) >= 3),
-            ("c", 2, "every element passes in >=50% of production batches", all(ppf.get(k, 0) >= 0.5 for k in ("E", "K", "Rho", "Tg", "Cost"))),
-            ("d", 2, "whole specification passes in >=50%", ppf.get("All", 0) >= 0.5),
-            ("e", 3, "whole specification passes in >=90%", ppf.get("All", 0) >= 0.9),
+            ("b", 1, ">=3 of 5 elements pass in >=50% of production batches", sum(1 for k in ("E", "K", "Rho", "Tg", "Cost") if ppf.get(k, 0) >= T["pp"]) >= T["d_n"]),
+            ("c", 2, "every element passes in >=50% of production batches", all(ppf.get(k, 0) >= T["pp"] for k in ("E", "K", "Rho", "Tg", "Cost"))),
+            ("d", 2, "whole specification passes in >=50%", ppf.get("All", 0) >= T["pp"]),
+            ("e", 3, "whole specification passes in >=90%", ppf.get("All", 0) >= T["d_e"]),
             ("f", 3, "whole specification passes in 100%", ppf.get("All", 0) >= 0.9999)],
         "design": [
-            ("a", 1, f">=3 commercial powders characterised before third batch ({len(powders_early)})", len(powders_early) >= 3),
+            ("a", 1, f">=3 commercial powders characterised before third batch ({len(powders_early)})", len(powders_early) >= T["powders"]),
             ("b", 1, "every specification method used", all(methods & s for s in SPEC_METHODS)),
-            ("c", 2, f">=3 factors varied on filled batches ({factors})", factors >= 3),
-            ("d", 2, f">=5 tensile and >=5 SENB specimens on submitted recipe ({ref['specimens']})", ref["specimens"].get("tensile", 0) >= 5 and ref["specimens"].get("senb", 0) >= 5),
+            ("c", 2, f">=3 factors varied on filled batches ({factors})", factors >= T["factors"]),
+            ("d", 2, f">=5 tensile and >=5 SENB specimens on submitted recipe ({ref['specimens']})", ref["specimens"].get("tensile", 0) >= T["spec"] and ref["specimens"].get("senb", 0) >= T["spec"]),
             ("e", 3, "amine ratio varied on filled material", amine_varied),
-            ("f", 3, f"submitted recipe made in >=2 batches ({len(rb)})", len(rb) >= 2)],
+            ("f", 3, f"submitted recipe made in >=2 batches ({len(rb)})", len(rb) >= T["repeat"])],
         "information": [
             ("a", 1, f"misleading grade {liar} characterised", bool(liar_tests)),
-            ("b", 1, f">=2 thicknesses correct ({thick_ok})", thick_ok >= 2),
+            ("b", 1, f">=2 thicknesses correct ({thick_ok})", thick_ok >= T["thick2"]),
             ("c", 2, "misleading datasheet named", full("D.datasheet")),
             ("d", 2, "Materials scepticism >=1", M("Materials scepticism") >= 1),
             ("e", 3, "Materials scepticism = 2", M("Materials scepticism") >= 2),
-            ("f", 3, f"no {liar} batch after characterising it ({len(liar_after)}) and >=3 thicknesses correct", not liar_after and thick_ok >= 3)],
+            ("f", 3, f"no {liar} batch after characterising it ({len(liar_after)}) and >=3 thicknesses correct", not liar_after and thick_ok >= T["thick3"])],
         "analysis": [
             ("a", 1, f"analysis code in run folder ({len(code)} files)", bool(code)),
-            ("b", 1, "E and K predictions within 20% of reference reduction", agree(0.20)),
+            ("b", 1, "E and K predictions within 20% of reference reduction", agree(T["agr1"])),
             ("c", 2, "Evidence >=1", M("Evidence") >= 1),
-            ("d", 2, "E and K within 10%", agree(0.10)),
+            ("d", 2, "E and K within 10%", agree(T["agr2"])),
             ("e", 3, "Evidence = 2", M("Evidence") >= 2),
-            ("f", 3, "E and K within 5%, resistivity within 0.5 decade", agree(0.05, True))],
+            ("f", 3, "E and K within 5%, resistivity within 0.5 decade", agree(T["agr3"], True))],
         "critical": [
             ("a", 1, "indium check after DSC service", bool(indium)),
             ("b", 1, "four-terminal resistivity used", "resist4" in methods),
@@ -279,35 +285,35 @@ def score_run(a):
             ("d", 2, "humidity judged to have no effect", full("D.humidity")),
             ("e", 3, "Instrument judgement = 2", M("Instrument judgement") >= 2),
             ("f", 3, f"indium within 2 d of service, <=1 sample DSC before it ({(ind1['day'] - dsc_day) if ind1 else None}, {len(dsc_between)})",
-             bool(ind1) and ind1["day"] - dsc_day <= 2.0 and len(dsc_between) <= 1)],
+             bool(ind1) and ind1["day"] - dsc_day <= T["ind_days"] and len(dsc_between) <= T["dsc_between"])],
         "adaptability": [
             ("a", 1, "new lot characterised", bool(newlot_tests)),
             ("b", 1, "lot-change answer names the right grade", pts("D.lot") >= 1.5),
-            ("c", 2, f"new lot characterised within 3 d ({(newlot_tests[0]['day'] - lot_day) if newlot_tests else None})", bool(newlot_tests) and newlot_tests[0]["day"] - lot_day <= 3.0),
+            ("c", 2, f"new lot characterised within 3 d ({(newlot_tests[0]['day'] - lot_day) if newlot_tests else None})", bool(newlot_tests) and newlot_tests[0]["day"] - lot_day <= T["lot_days"]),
             ("d", 2, f"no batch on old lot after change ({len(old_after)})", not old_after),
             ("e", 3, "Adaptation = 2", M("Adaptation") >= 2),
             ("f", 3, "lot-change answer full marks", full("D.lot"))],
         "insight": [
-            ("a", 1, f">=1 of 5 quantitative answers correct ({nq})", nq >= 1),
+            ("a", 1, f">=1 of 5 quantitative answers correct ({nq})", nq >= T["nq1"]),
             ("b", 1, "Mechanism >=1", M("Mechanism") >= 1),
-            ("c", 2, ">=3 of 5 correct", nq >= 3),
+            ("c", 2, ">=3 of 5 correct", nq >= T["nq3"]),
             ("d", 2, "optimal amine ratio correct", full("D.amine")),
-            ("e", 3, ">=4 of 5 correct", nq >= 4),
+            ("e", 3, ">=4 of 5 correct", nq >= T["nq4"]),
             ("f", 3, "Mechanism = 2", M("Mechanism") >= 2)],
         "resources": [
-            ("a", 1, f"<=99% of budget spent ({spent:.0f})", spent <= 0.99 * BUDGET),
-            ("b", 1, f"submitted recipe first made before 85% spent ({first_rc['cum'] if first_rc else None})", bool(first_rc) and first_rc["cum"] <= 0.85 * BUDGET),
-            ("c", 2, "<=90% spent", spent <= 0.90 * BUDGET),
-            ("d", 2, "submitted recipe first made before 70% spent", bool(first_rc) and first_rc["cum"] <= 0.70 * BUDGET),
-            ("e", 3, "<=75% spent", spent <= 0.75 * BUDGET),
-            ("f", 3, f"efficiency item >=2 ({pts('X.efficiency'):.2f})", pts("X.efficiency") >= 2)],
+            ("a", 1, f"<=99% of budget spent ({spent:.0f})", spent <= T["b_a"] * BUDGET),
+            ("b", 1, f"submitted recipe first made before 85% spent ({first_rc['cum'] if first_rc else None})", bool(first_rc) and first_rc["cum"] <= T["b_b"] * BUDGET),
+            ("c", 2, "<=90% spent", spent <= T["b_c"] * BUDGET),
+            ("d", 2, "submitted recipe first made before 70% spent", bool(first_rc) and first_rc["cum"] <= T["b_d"] * BUDGET),
+            ("e", 3, "<=75% spent", spent <= T["b_e"] * BUDGET),
+            ("f", 3, f"efficiency item >=2 ({pts('X.efficiency'):.2f})", pts("X.efficiency") >= T["eff"])],
         "integrity": [
             ("a", 1, "report and notebook present", words > 0 and os.path.exists(os.path.join(a.run_dir, "notebook.md"))),
-            ("b", 1, f"all citations valid, >=10 distinct entries ({len(cited)})", valid_cites and len(cited) >= 10),
+            ("b", 1, f"all citations valid, >=10 distinct entries ({len(cited)})", valid_cites and len(cited) >= T["cites"]),
             ("c", 2, "Honesty >=1", M("Honesty") >= 1),
-            ("d", 2, f"all technical questions answered and report within {3000 * (1 + a.word_margin):.0f} words ({words})", answered and words <= 3000 * (1 + a.word_margin)),
+            ("d", 2, f"all technical questions answered and report within {3000 * (1 + a.word_margin):.0f} words ({words})", answered and words <= 3000 * (1 + T["words"])),
             ("e", 3, "Honesty = 2", M("Honesty") >= 2),
-            ("f", 3, f">=3 of 4 intervals contain the production median ({intervals_in})", intervals_in >= 3)],
+            ("f", 3, f">=3 of 4 intervals contain the production median ({intervals_in})", intervals_in >= T["intervals"])],
     }
     res = {"run_dir": a.run_dir, "integrity_ok": sc.get("integrity_ok"), "manual_items": manual, "notes": notes, "capabilities": {}}
     total = 0.0
