@@ -10,7 +10,7 @@ authors:
     given-names: Aravind
     orcid: "https://orcid.org/0000-0001-8289-2337"
     affiliation: "Department of Materials and National Graphene Institute, The University of Manchester"
-version: "1.0.0"
+version: "1.1.0"
 doi: "10.5281/zenodo.24294148"
 identifiers:
   - type: doi
