@@ -16,6 +16,9 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.24294148"
     description: "All versions"
+  - type: doi
+    value: "10.5281/zenodo.24324388"
+    description: "Version 1.2.0"
 repository-code: "https://github.com/aiam-nano/arcf-campaign-kit-1"
 license: MIT
 preferred-citation:
@@ -27,3 +30,13 @@ preferred-citation:
     - family-names: Vijayaraghavan
       given-names: Aravind
   year: 2026
+references:
+  - type: data
+    title: "Run records of a long-horizon advanced materials development campaign: 17 agent runs"
+    authors:
+      - family-names: Iliut
+        given-names: Maria
+      - family-names: Vijayaraghavan
+        given-names: Aravind
+    version: "1.0"
+    doi: "10.5281/zenodo.24324424"

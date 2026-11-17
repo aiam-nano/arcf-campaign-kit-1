@@ -104,7 +104,7 @@ Run each agent on campaigns A, B and C at least, and more than once if you can. 
 
 ## Reproducing the paper's scores
 
-The records of the 17 runs in the paper are deposited at Zenodo (doi: [to be added]). Their ledgers are published without timestamps or signatures, so the scorer's normal check rejects them. Run it with `--unverified` to score a published run folder:
+The records of the 17 runs in the paper are deposited at Zenodo ([doi:10.5281/zenodo.24324424](https://doi.org/10.5281/zenodo.24324424)). Their ledgers are published without timestamps or signatures, so the scorer's normal check rejects them. Run it with `--unverified` to score a published run folder:
 
 ```
 scorer/<platform>/vlab-score score --dir <deposit>/runs/fable52_A/run_folder --out fable52_A_score.json --unverified

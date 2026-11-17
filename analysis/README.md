@@ -2,7 +2,7 @@
 
 These scripts reproduce the paper's numbers, tables and figures from the published run records. They need Python 3.10 or later with numpy, scipy and matplotlib, and the data deposit:
 
-> Run records of a long-horizon advanced materials development campaign: 17 agent runs (dataset), Zenodo, DOI: [to be added]
+> Run records of a long-horizon advanced materials development campaign: 17 agent runs (dataset), version 1.0, Zenodo, DOI: [10.5281/zenodo.24324424](https://doi.org/10.5281/zenodo.24324424)
 
 Download and unzip the deposit, then run the scripts from the repository root, giving the deposit folder with `--data` (or setting the environment variable `ARCF_DATA`). Outputs go to `analysis/out/` unless `--out` says otherwise.
 
