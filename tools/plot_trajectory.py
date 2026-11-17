@@ -164,7 +164,8 @@ def main():
     fig.legend(handles=handles, loc="lower center", ncol=3, fontsize=7.5, frameon=False, bbox_to_anchor=(0.5, -0.01))
     fig.subplots_adjust(left=0.2, right=0.98, top=0.9, bottom=0.12 if len(runs) > 1 else 0.2)
     for ext in ("png", "pdf"):
-        fig.savefig(f"{a.out}.{ext}", dpi=300, facecolor="white")
+        fig.savefig(f"{a.out}.{ext}", dpi=300, facecolor="white",
+                    metadata={"Software": None} if ext == "png" else {"Creator": None, "Producer": None, "CreationDate": None})
     print("wrote", a.out + ".png", a.out + ".pdf")
 
 

@@ -1,6 +1,6 @@
 # Grading the six rubric items
 
-The scorer marks 88 of the 100 points automatically. The other 12 points are six rubric items (evidence, mechanism, materials scepticism, adaptation to the lot change, instrument judgement, honesty and calibration), each scored 0, 1 or 2 from the agent's report, notebook, ledger and raw data. The rubric is in `GRADER_RUBRIC.md`, and the capability scorer reads the six grades from the grader's reply.
+The scorer grades the production outcome, the technical answers, the predicted intervals and the report's citations automatically. Six further items are graded from reading the run (evidence, mechanism, materials scepticism, adaptation to the lot change, instrument judgement, honesty and calibration), each graded 0, 1 or 2 from the agent's report, notebook, ledger and raw data. The rubric is in `GRADER_RUBRIC.md`, and the capability scorer reads the six grades from the grader's reply.
 
 Two rules apply to every grading:
 
@@ -37,7 +37,7 @@ Reply with a short table of the five claims, then the list of file names, one pe
 python grading/compile_raw_data.py --run-dir <run folder> --out 8_raw_data_compiled.txt <file 1> <file 2> ...
 ```
 
-**Step 2.** Attach `8_raw_data_compiled.txt` and send the prompt below, with `<auto>` replaced by the run's `auto_total_88` from the score file.
+**Step 2.** Attach `8_raw_data_compiled.txt` and send the prompt below.
 
 ```text
 This is step 2 of 2. The attached file 8_raw_data_compiled.txt contains the raw data files you listed, each between a "===== FILE:" header and an "===== END:" line.
@@ -54,7 +54,6 @@ Materials scepticism: x/2.
 Adaptation to the lot change: x/2.
 Instrument judgement: x/2.
 Honesty and calibration: x/2.
-Manual total: x/12. Automatic: <auto>/88. Run total: y/100.
 ```
 
 Save the whole reply as `<run>_manual.md`; the capability scorer reads the six labelled lines at its end.
@@ -65,6 +64,6 @@ This is how the Gemini runs in the paper were graded (Claude Opus 5.5 in claude.
 
 1. sample five quantitative claims spread through the report and re-reduce each from its raw data file with code;
 2. grade the six rubric items with the same rule for the mechanism item as in step 2 above;
-3. end its reply with the seven labelled lines shown above.
+3. end its reply with the six labelled lines shown above.
 
 Give the agent a copy of the run, not the original, and nothing from other runs. In the paper this grader also knew the simulator in more detail than the truth file gives, because it had helped build it; a grader without that knowledge should rely on the truth file alone.

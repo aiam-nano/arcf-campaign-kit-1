@@ -1,12 +1,12 @@
 # ARCF campaign kit 1: a long-horizon advanced materials development campaign for AI agents
 
-This kit lets you put an AI agent (a language model working through a tool-using harness such as Claude Code, Antigravity, Codex or Gemini CLI) in charge of a simulated laboratory campaign, and then score what it did against nine capabilities of a human researcher. It is the test used in:
+This kit lets you put an AI agent (a language model working through a tool-using harness such as Claude Code, Antigravity, Codex or Gemini CLI) in charge of a simulated laboratory campaign, and then score what it did on nine researcher capabilities. It is the test used in:
 
-> M. Iliut and A. Vijayaraghavan, *Profiling AI agents as researchers: a long-horizon advanced materials development campaign scored against human researcher capabilities* (2026). See `CITATION.cff`.
+> M. Iliut and A. Vijayaraghavan, *Profiling AI agents as researchers: a long-horizon advanced materials development campaign scored on nine researcher capabilities*. See `CITATION.cff`.
 
 ARCF is the Agentic Researcher Capability Framework. This is its first campaign kit.
 
-The kit is archived at Zenodo. To cite all versions, use [doi:10.5281/zenodo.24294148](https://doi.org/10.5281/zenodo.24294148); version 1.0.0 is [doi:10.5281/zenodo.24294149](https://doi.org/10.5281/zenodo.24294149).
+The kit is archived at Zenodo. To cite it, use [doi:10.5281/zenodo.24294148](https://doi.org/10.5281/zenodo.24294148), which resolves to the latest version.
 
 ## What the agent faces
 
@@ -14,7 +14,7 @@ The agent is told it is the lead materials scientist at a company that needs a g
 
 The laboratory is not well behaved. One supplier's datasheet is wrong, the best grade changes lot partway through the campaign, an instrument reads high after a service, and a logged variable correlates with the results without causing them. At the end the agent answers ten technical questions, predicts its material's properties with intervals, and writes a report that cites its evidence.
 
-In the paper a run took the agent between 9 and 93 minutes of wall-clock time and between 33 and 161 tool calls.
+In the paper a run took the agent between 9 and 90 minutes of wall-clock time and between 33 and 161 tool calls.
 
 ## What is in the kit
 
@@ -25,7 +25,7 @@ In the paper a run took the agent between 9 and 93 minutes of wall-clock time an
 | `scorer/` | `vlab-score`, the automatic scorer, for the same six platforms. It scores runs on campaigns A–E only |
 | `answers/` | The hidden truth of each campaign (`truth_<campaign>.json`) and a reference submission made by an oracle with access to the hidden model (`reference_submission_<campaign>.json`) |
 | `grading/` | The rubric for the six manually graded items, the grader prompts, and a helper that compiles raw data for the grader |
-| `tools/` | Python tools: `new_run.py` (sets up a run folder), `capability_score.py` (the nine-capability profile), `audit_transcript.py` (checks a harness transcript for rule breaches), `baselines.py` (random-search and Bayesian-optimisation agents), `plot_trajectory.py` (draws a run's campaign timeline) and `ref_analysis.py` (reference data reduction) |
+| `tools/` | Python tools: `new_run.py` (sets up a run folder), `capability_score.py` (the nine-capability profile), `audit_transcript.py` (checks a harness transcript for rule breaches), `baselines.py` (random-search and Bayesian-optimisation agents), `plot_trajectory.py` (draws a run's campaign timeline), `ref_analysis.py` (reference data reduction) and `score_reference.py` (seals and scores the oracle's reference submissions) |
 | `results/` | The results of the 17 runs reported in the paper, for comparison |
 | `analysis/` | The scripts that reproduce the paper's statistics, sensitivity analysis, costs and figures from the published run records (see `analysis/README.md`) |
 
@@ -49,6 +49,7 @@ The Python tools need Python 3.10 or later with `numpy` and `matplotlib` (`pip i
 Everything needed to score a run, including the answers, is public. That has two consequences.
 
 - **Keep the agent away from this repository.** Make each run folder somewhere the agent cannot browse out of into the kit, and do not give the agent web access to it. `tools/new_run.py` refuses to put a run folder inside the kit.
+- **The answers for all five campaigns, A to E, are public** in `answers/`, and the published run records include the campaigns' keys and truth.
 - **A score from this kit is a reproduction, not a sealed test.** A model trained after the kit was published may have seen the answers. Use the kit to compare your agent with the paper's results, to study how it works, or to develop it; for a clean comparison between models, use fresh campaigns that have never been published. Fresh private campaigns will be offered through the ARCF evaluation rounds.
 
 ## Running an agent
@@ -73,7 +74,7 @@ Everything needed to score a run, including the answers, is public. That has two
    scorer/<platform>/vlab-score score --dir ../runs/mymodel_A --out mymodel_A_score.json
    ```
 
-   The scorer checks the ledger's signature chain and the hash of every data file, makes the submitted recipe in forty virtual production batches, grades the ten technical answers, the predicted intervals and the report's citations, and writes 88 of the 100 points to the score file, with the production pass fraction for each element of the specification and for the whole.
+   The scorer checks the ledger's signature chain and the hash of every data file, makes the submitted recipe in forty virtual production batches, grades the ten technical answers, the predicted intervals and the report's citations, and writes the score file: the production pass fraction for each element of the specification and for the whole, and for each item the true value, the agent's value and the result.
 
 6. **Audit the transcript:**
 
@@ -101,6 +102,16 @@ Look at the profile, not only the total. In the paper, two systems with capabili
 
 Run each agent on campaigns A, B and C at least, and more than once if you can. Run-to-run variation in the paper was about 5 points on the capability score, so differences smaller than that between single runs are not meaningful. `results/paper1_results.md` gives the paper's results for comparison.
 
+## Reproducing the paper's scores
+
+The records of the 17 runs in the paper are deposited at Zenodo (doi: [to be added]). Their ledgers are published without timestamps or signatures, so the scorer's normal check rejects them. Run it with `--unverified` to score a published run folder:
+
+```
+scorer/<platform>/vlab-score score --dir <deposit>/runs/fable52_A/run_folder --out fable52_A_score.json --unverified
+```
+
+This skips the signature check and still checks every data file against the hash its ledger lists; it reproduces each run's `score.json` in the deposit. `analysis/` then recomputes every capability profile and reproduces the paper's statistics and figures from the deposited records (see `analysis/README.md`). Runs you make yourself are signed as usual and are scored without `--unverified`.
+
 ## Baselines
 
 `tools/baselines.py` runs a random-search agent and a Gaussian-process Bayesian-optimisation agent through the same `vlab` interface and budget (the work folder is created afresh, so it must not already hold anything you want to keep):
@@ -117,10 +128,12 @@ If you publish a result made with this kit, please give the model and its versio
 
 The simulator's source code, the format of the campaign keys and the program that generates new campaigns are not published, so that future evaluation rounds can use fresh campaigns that no model has seen. The model behind the simulator is described, with its equations and parameter ranges, in the paper's supplementary information (Section S10), and the hidden values for campaigns A–E are in `answers/`.
 
+To generate data, `vlab` has to contain the hidden model, in obfuscated form. Please do not disassemble or decompile it: nothing in it helps you score a run, and keeping it closed protects the fresh campaigns of future evaluation rounds.
+
 ## Licences
 
 The code in this repository (the Python tools and the `vlab` and `vlab-score` programs) is released under the MIT licence (`LICENSE`). The data and documents (the prompt, handbook, rubric, grader prompts, campaign keys, answer files and results) are released under the Creative Commons Attribution 4.0 International licence (`LICENSE-DATA.md`).
 
 ## Contact
 
-Aravind Vijayaraghavan, Department of Materials and National Graphene Institute, The University of Manchester (aravind@manchester.ac.uk).
+Aravind Vijayaraghavan, Department of Materials and National Graphene Institute, The University of Manchester. Please use the issues of this repository.

@@ -1,8 +1,8 @@
 # Analysis code for the paper
 
-These scripts reproduce every number, table and figure of the paper's results from the published run records. They need Python 3.10 or later with numpy, scipy and matplotlib, and the data deposit:
+These scripts reproduce the paper's numbers, tables and figures from the published run records. They need Python 3.10 or later with numpy, scipy and matplotlib, and the data deposit:
 
-> Run records of a long-horizon advanced materials development campaign: 17 agent runs (dataset), Zenodo, 2026, DOI: [to be added]
+> Run records of a long-horizon advanced materials development campaign: 17 agent runs (dataset), Zenodo, DOI: [to be added]
 
 Download and unzip the deposit, then run the scripts from the repository root, giving the deposit folder with `--data` (or setting the environment variable `ARCF_DATA`). Outputs go to `analysis/out/` unless `--out` says otherwise.
 
@@ -11,6 +11,7 @@ python analysis/rescore.py     --data <deposit>   # re-scores all 17 runs with t
 python analysis/stats.py       --data <deposit>   # system means, 90% bootstrap intervals, run-to-run spread, paired comparisons
 python analysis/sensitivity.py --data <deposit>   # the 56 single-threshold moves and the all-easier and all-stricter scorings
 python analysis/costs.py       --data <deposit>   # tokens and API-equivalent cost of every run, from the harness transcripts
+python analysis/events.py      --data <deposit>   # response to the planted events, the Section 4.4-4.6 counts, and run times and tool calls
 python analysis/figures.py     --data <deposit>   # Figs 2, 3, 4 and 6 and ESI Figs S1 and S2 (run stats.py and sensitivity.py first)
 ```
 
@@ -19,10 +20,11 @@ python analysis/figures.py     --data <deposit>   # Figs 2, 3, 4 and 6 and ESI F
 | `rescore.py` | ESI Table S3b (capability scores of every run) |
 | `stats.py` | Section 4.2 to 4.4, Fig. 3a, Fig. 4, Fig. 6b, ESI Table S3a |
 | `sensitivity.py` | Section 4.9, ESI Table S4, ESI Fig. S1 |
-| `costs.py` | ESI Table S6 |
-| `figures.py` | Figs 2, 3, 4 and 6, ESI Figs S1 and S2 |
+| `costs.py` | ESI Table S6 (tokens and cost) |
+| `events.py` | Sections 4.4 to 4.6, ESI Table S3c, ESI Table S6 (wall-clock time, tool calls and context compactions) |
+| `figures.py` | Figs 2, 3, 4 and 6, ESI Figs S1 and S2; the oracle in Fig. 3b comes from `results/reference_scores.json`, written by `tools/score_reference.py` |
 
-Fig. 1 is a drawn schematic (`assets/fig1_campaign_schematic.svg`). Fig. 5 is drawn from the two runs' signed ledgers with the kit's trajectory tool:
+Fig. 1 is a drawn schematic (`assets/fig1_campaign_schematic.svg`). Fig. 5 is drawn from the two runs' ledgers with the kit's trajectory tool:
 
 ```
 python tools/plot_trajectory.py --truth answers/truth_C.json \

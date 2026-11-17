@@ -31,32 +31,63 @@ from datetime import datetime
 # ---------------------------------------------------------------- transcript readers
 
 def _ts(s):
+    """A time as an ISO timestamp (harness transcripts) or as seconds elapsed from the run's
+    first event (the published transcripts, whose field is elapsed_s)."""
+    if isinstance(s, (int, float)) and not isinstance(s, bool):
+        return float(s)
+    if s is None:
+        return None
     try:
         return datetime.fromisoformat(s.replace("Z", "+00:00"))
     except Exception:
         return None
 
+def _t(d, key):
+    return d.get("elapsed_s", d.get(key))
+
+def _elapsed(ev):
+    """Express every time in the events as seconds from the first event."""
+    ts = [t for t in ev["times"] if t is not None]
+    if not ts:
+        return ev
+    t0 = min(ts)
+    def conv(v):
+        t = v if isinstance(v, datetime) else (_ts(v) if v is not None else None)
+        if t is None: return None
+        d = t - t0
+        return d.total_seconds() if hasattr(d, "total_seconds") else float(d)
+    ev["times"] = sorted(conv(t) for t in ts)
+    ev["compactions"] = [conv(c) for c in ev["compactions"]]
+    for k in ("user", "thinking", "context"):
+        ev[k] = [(conv(x[0]),) + tuple(x[1:]) for x in ev[k]]
+    for c in ev["calls"]:
+        c["time"] = conv(c["time"])
+    return ev
+
+def _min(sec, nd=0):
+    return "?" if sec is None else f"{sec / 60:.{nd}f} min"
+
 def read_antigravity(lines):
     ev = {"calls": [], "user": [], "compactions": [], "tokens": Counter(), "times": [], "text": [], "thinking": [], "context": []}
     for d in lines:
-        t = _ts(d.get("created_at", ""))
-        if t: ev["times"].append(t)
+        t = _ts(_t(d, "created_at"))
+        if t is not None: ev["times"].append(t)
         typ = d.get("type")
         content = d.get("content") or ""
         if typ == "USER_INPUT":
-            ev["user"].append((d.get("created_at"), content))
+            ev["user"].append((_t(d, "created_at"), content))
         if typ == "CHECKPOINT" and "compaction" in content.lower():
-            ev["compactions"].append(d.get("created_at"))
+            ev["compactions"].append(_t(d, "created_at"))
         for k in ("input_tokens", "output_tokens", "cache_read_tokens"):
             ev["tokens"][k] += d.get(k) or 0
         if content: ev["text"].append(content)
-        if d.get("thinking"): ev["thinking"].append((d.get("created_at"), d["thinking"]))
+        if d.get("thinking"): ev["thinking"].append((_t(d, "created_at"), d["thinking"]))
         if typ == "SYSTEM_MESSAGE" or typ == "CHECKPOINT" or typ == "USER_INPUT":
-            ev["context"].append((d.get("created_at"), typ, content))
+            ev["context"].append((_t(d, "created_at"), typ, content))
         for tc in d.get("tool_calls") or []:
             name, a = tc.get("name", ""), tc.get("args", {}) or {}
             ev["calls"].append({
-                "step": d.get("step_index"), "time": d.get("created_at"), "tool": name,
+                "step": d.get("step_index"), "time": _t(d, "created_at"), "tool": name,
                 "command": a.get("CommandLine"),
                 "path": a.get("Path") or a.get("Target") or a.get("AbsolutePath"),
                 "cwd": a.get("Cwd") or a.get("cwd"),
@@ -70,29 +101,29 @@ def read_antigravity(lines):
 def read_claude_code(lines):
     ev = {"calls": [], "user": [], "compactions": [], "tokens": Counter(), "times": [], "text": [], "thinking": [], "context": []}
     for d in lines:
-        t = _ts(d.get("timestamp", ""))
-        if t: ev["times"].append(t)
+        t = _ts(_t(d, "timestamp"))
+        if t is not None: ev["times"].append(t)
         if d.get("isCompactSummary") or d.get("type") == "summary":
-            ev["compactions"].append(d.get("timestamp"))
+            ev["compactions"].append(_t(d, "timestamp"))
         if d.get("type") == "system" and d.get("subtype") == "api_error":
             ev["api_errors"] = ev.get("api_errors", 0) + 1
         if d.get("type") == "system" and d.get("subtype") == "compact_boundary":
-            ev["compactions"].append(d.get("timestamp"))
+            ev["compactions"].append(_t(d, "timestamp"))
         if d.get("type") == "attachment":
-            ev["context"].append((d.get("timestamp"), "attachment", json.dumps(d.get("attachment"))[:20000]))
+            ev["context"].append((_t(d, "timestamp"), "attachment", json.dumps(d.get("attachment"))[:20000]))
         if d.get("type") == "api-request-blob":
-            ev["context"].append((d.get("timestamp"), "injected", json.dumps(d.get("message"))[:20000]))
+            ev["context"].append((_t(d, "timestamp"), "injected", json.dumps(d.get("message"))[:20000]))
         if d.get("type") in ("system", "summary") or d.get("isCompactSummary"):
             m = d.get("message") or {}
-            ev["context"].append((d.get("timestamp"), d.get("type"), json.dumps(m)[:20000] if m else str(d.get("summary", ""))))
+            ev["context"].append((_t(d, "timestamp"), d.get("type"), json.dumps(m)[:20000] if m else str(d.get("summary", ""))))
         msg = d.get("message") or {}
         content = msg.get("content")
         if d.get("type") == "user" and not d.get("isCompactSummary"):
             if isinstance(content, str):
-                ev["user"].append((d.get("timestamp"), content))
+                ev["user"].append((_t(d, "timestamp"), content))
             elif isinstance(content, list):
                 txt = " ".join(c.get("text", "") for c in content if isinstance(c, dict) and c.get("type") == "text")
-                if txt.strip(): ev["user"].append((d.get("timestamp"), txt))
+                if txt.strip(): ev["user"].append((_t(d, "timestamp"), txt))
                 for c in content:
                     if isinstance(c, dict) and c.get("type") == "tool_result":
                         r = c.get("content")
@@ -115,11 +146,11 @@ def read_claude_code(lines):
                 if c.get("type") == "text": ev["text"].append(c.get("text", ""))
                 if c.get("type") == "thinking":
                     ev["thinking_blocks"] = ev.get("thinking_blocks", 0) + 1
-                    if c.get("thinking"): ev["thinking"].append((d.get("timestamp"), c.get("thinking", "")))
+                    if c.get("thinking"): ev["thinking"].append((_t(d, "timestamp"), c.get("thinking", "")))
                 if c.get("type") != "tool_use": continue
                 name, a = c.get("name", ""), c.get("input", {}) or {}
                 ev["calls"].append({
-                    "step": None, "time": d.get("timestamp"), "tool": name,
+                    "step": None, "time": _t(d, "timestamp"), "tool": name,
                     "command": a.get("command"),
                     "path": a.get("file_path") or a.get("path") or a.get("notebook_path"),
                     "written": a.get("content") or a.get("new_string") or "",
@@ -138,8 +169,8 @@ def load_transcript(path):
                 try: lines.append(json.loads(l))
                 except json.JSONDecodeError: pass
     if any("step_index" in d for d in lines[:5]):
-        return "Antigravity", read_antigravity(lines)
-    return "Claude Code", read_claude_code(lines)
+        return "Antigravity", _elapsed(read_antigravity(lines))
+    return "Claude Code", _elapsed(read_claude_code(lines))
 
 # ---------------------------------------------------------------- integrity
 
@@ -313,6 +344,8 @@ def trajectory(ents, truth):
 
 # ---------------------------------------------------------------- report
 
+PLACEHOLDER, STAND_IN = "<run folder>", "C:\\run_folder"
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--transcript", required=True)
@@ -320,19 +353,31 @@ def main():
     ap.add_argument("--truth")
     ap.add_argument("--ledger")
     ap.add_argument("--out")
+    ap.add_argument("--label", help="name for the run in the report's heading (default: the run folder's name)")
     a = ap.parse_args()
 
     fmt, ev = load_transcript(a.transcript)
-    integ = integrity(ev, a.run_dir)
+    run_dir = a.run_dir
+    if PLACEHOLDER in run_dir or any(PLACEHOLDER in (c.get(k) or "") for c in ev["calls"] for k in ("command", "path", "cwd")):
+        # published transcripts write the run folder as <run folder>; give it a concrete path so
+        # that the path checks below can resolve it
+        run_dir = run_dir.replace(PLACEHOLDER, STAND_IN)
+        for c in ev["calls"]:
+            for k in ("command", "path", "cwd", "written"):
+                if isinstance(c.get(k), str): c[k] = c[k].replace(PLACEHOLDER, STAND_IN)
+        ev["text"] = [t.replace(PLACEHOLDER, STAND_IN) if isinstance(t, str) else t for t in ev["text"]]
+    integ = integrity(ev, run_dir)
     o = []
-    o.append(f"# Transcript audit: {a.run_dir}\n")
+    import ntpath
+    label = a.label or ntpath.basename(a.run_dir.rstrip("/\\")) or a.run_dir
+    o.append(f"# Transcript audit: {label}\n")
     o.append(f"Transcript: `{a.transcript}` ({fmt} format).\n")
     times = sorted(ev["times"])
     if times:
-        mins = (times[-1] - times[0]).total_seconds() / 60
-        o.append(f"## Session\n\nStart {times[0]:%Y-%m-%d %H:%M} UTC, end {times[-1]:%H:%M} UTC, wall-clock {mins:.0f} min. "
+        mins = (times[-1] - times[0]) / 60
+        o.append(f"## Session\n\nTimes are elapsed from the first event of the transcript. Wall-clock {mins:.0f} min. "
                  f"{len(ev['calls'])} tool calls. Context compactions: {len(ev['compactions'])}"
-                 + (f" (at {', '.join(str(c)[11:16] for c in ev['compactions'])} UTC)" if ev["compactions"] else "") + ". "
+                 + (f" (at {', '.join(_min(c) for c in ev['compactions'])})" if ev["compactions"] else "") + ". "
                  f"Tokens: {ev['tokens']['input_tokens']:,} input, {ev['tokens']['output_tokens']:,} output, {ev['tokens']['cache_read_tokens']:,} cache read"
                  + (f", {ev['tokens']['cache_write_tokens']:,} cache write" if ev['tokens'].get('cache_write_tokens') else "") + ".\n")
     tb = ev.get("thinking_blocks")
@@ -350,17 +395,17 @@ def main():
     if integ["flags"]:
         o.append(f"**{len(integ['flags'])} item(s) for the examiner to review** (flags are prompts to look, not verdicts):\n")
         for t, tool, what, ctx in integ["flags"]:
-            o.append(f"- {str(t)[11:19]} `{tool}`: {what}: `{ctx}`")
+            o.append(f"- {_min(t, 1)} `{tool}`: {what}: `{ctx.replace(STAND_IN, PLACEHOLDER)}`")
         o.append("")
     else:
         o.append("No flags: every file path is inside the run folder, and no command or script inspects the binary or key, writes to `.vlab` or `lab_data`, uses the network, or touches harness memory or the registry.\n")
 
-    hits = leak_scan(ev, a.run_dir)
+    hits = leak_scan(ev, run_dir)
     o.append("## Leak scan\n")
     if hits:
         o.append(f"**{len(hits)} item(s) to review**: names of other runs or examiner material, or references to earlier conversations, in the model's reasoning, its tool output or context injected by the harness. Check each against the transcript; a hit in injected context means harness memory reached the model.\n")
         for where, t, label, ctx in hits:
-            o.append(f"- {where}{(' ' + str(t)[11:19]) if t else ''}: {label}: `{ctx}`")
+            o.append(f"- {where}{(' ' + _min(t, 1)) if t is not None else ''}: {label}: `{ctx.replace(STAND_IN, PLACEHOLDER)}`")
         o.append("")
     else:
         o.append("No other run, examiner file or earlier conversation is mentioned in the model's reasoning, its tool output or the context the harness injected.\n")
@@ -376,7 +421,7 @@ def main():
         q = next((c for c in ev["calls"] if c["command"] and re.search(r"vlab(\.exe)?\s+questions", c["command"])), None)
         if last:
             o.append(f"Last experimental entry {last['e']} (day {last['day']:.2f}, {last['cum']:.1f} credits spent)"
-                     + (f"; laboratory closed with `vlab questions` at {str(q['time'])[11:16]} UTC" if q else "; `vlab questions` not found in the transcript") + ".\n")
+                     + (f"; laboratory closed with `vlab questions` at {_min(q['time'])}" if q else "; `vlab questions` not found in the transcript") + ".\n")
     text = "\n".join(o)
     if a.out:
         open(a.out, "w", encoding="utf-8").write(text)

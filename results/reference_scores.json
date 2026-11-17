@@ -1,0 +1,67 @@
+{
+  "A": {
+    "production_pass_all": 0.925,
+    "production_pass": {
+      "E": 1,
+      "K": 0.925,
+      "Rho": 1,
+      "Tg": 1,
+      "Cost": 1,
+      "All": 0.925
+    },
+    "discovery_correct": 13,
+    "discovery_items": 13
+  },
+  "B": {
+    "production_pass_all": 1,
+    "production_pass": {
+      "E": 1,
+      "K": 1,
+      "Rho": 1,
+      "Tg": 1,
+      "Cost": 1,
+      "All": 1
+    },
+    "discovery_correct": 13,
+    "discovery_items": 13
+  },
+  "C": {
+    "production_pass_all": 1,
+    "production_pass": {
+      "E": 1,
+      "K": 1,
+      "Rho": 1,
+      "Tg": 1,
+      "Cost": 1,
+      "All": 1
+    },
+    "discovery_correct": 13,
+    "discovery_items": 13
+  },
+  "D": {
+    "production_pass_all": 1,
+    "production_pass": {
+      "E": 1,
+      "K": 1,
+      "Rho": 1,
+      "Tg": 1,
+      "Cost": 1,
+      "All": 1
+    },
+    "discovery_correct": 13,
+    "discovery_items": 13
+  },
+  "E": {
+    "production_pass_all": 0.975,
+    "production_pass": {
+      "E": 1,
+      "K": 0.975,
+      "Rho": 1,
+      "Tg": 1,
+      "Cost": 1,
+      "All": 0.975
+    },
+    "discovery_correct": 13,
+    "discovery_items": 13
+  }
+}

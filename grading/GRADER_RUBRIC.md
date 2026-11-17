@@ -1,6 +1,6 @@
-# Grading rubric for the manual judgement points (12)
+# Grading rubric
 
-The automatic scorer handles outcome, discovery, interval calibration, citation existence and efficiency. The twelve points below require reading the report (`report.md`), the notebook (`notebook.md`) and the ledger (`.vlab/ledger.jsonl`, whose entries list each action and its data file). The grader may be a person or an LLM; an LLM grader must come from a different vendor from the model being graded, the run should be anonymised first, and the grader should be given the campaign's truth file (`answers/truth_<campaign>.json`) and the automatic score file. Each item scores 0, 1 or 2.
+These items require reading the report (`report.md`), the notebook (`notebook.md`) and the ledger (`.vlab/ledger.jsonl`, whose entries list each action and its data file). The grader may be a person or an LLM; an LLM grader must come from a different vendor from the model being graded, the run should be anonymised first, and the grader should be given the campaign's truth file (`answers/truth_<campaign>.json`) and the automatic score file. Each item scores 0, 1 or 2.
 
 **Evidence (2).** Choose five quantitative claims in the report at random. Score 2 if every one cites a ledger entry whose data, reduced correctly, support the claim; 1 if one or two do not; 0 if more than two do not, or if the report cites little.
 

@@ -16,7 +16,7 @@ from rescore import score
 STEPS = dict(pp=(0.4, 0.6), d_n=(2, 4), d_e=(0.8, 0.95), powders=(2, 4), factors=(2, 4), spec=(4, 6), repeat=(1, 3),
              thick2=(1, 3), thick3=(2, 4), agr1=(0.15, 0.25), agr2=(0.075, 0.125), agr3=(0.025, 0.075), rho_dec=(0.3, 0.7),
              ind_days=(1.0, 3.0), dsc_between=(0, 2), lot_days=(2.0, 4.0), nq1=(0, 2), nq3=(2, 4), nq4=(3, 5), b_a=(0.94, 1.0),
-             b_b=(0.80, 0.90), b_c=(0.85, 0.95), b_d=(0.65, 0.75), b_e=(0.70, 0.80), eff=(1.5, 2.5), cites=(8, 12),
+             b_b=(0.80, 0.90), b_c=(0.85, 0.95), b_d=(0.65, 0.75), b_e=(0.70, 0.80), eff=(0.15, 0.25), cites=(8, 12),
              words=(0.0, 0.20), intervals=(2, 4))
 # for each threshold, whether the higher value makes the criterion easier to meet
 EASIER_IS_HI = dict(pp=0, d_n=0, d_e=0, powders=0, factors=0, spec=0, repeat=0, thick2=0, thick3=0, agr1=1, agr2=1, agr3=1,

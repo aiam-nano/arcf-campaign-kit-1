@@ -31,7 +31,10 @@ def sysof(r): return C.system_of(r["run_id"])
 def ppass(r): return 100 * float(r["production_pass_all"])
 def mins(r): return float(r["wall_clock_min"])
 def save(fig, name):
-    for ext in ("png", "pdf"): fig.savefig(os.path.join(OUT, f"{name}.{ext}"), bbox_inches="tight", facecolor="white")
+    # no author, date or software fields in the files' metadata
+    meta = {"png": {"Software": None}, "pdf": {"Creator": None, "Producer": None, "CreationDate": None}}
+    for ext in ("png", "pdf"):
+        fig.savefig(os.path.join(OUT, f"{name}.{ext}"), bbox_inches="tight", facecolor="white", metadata=meta[ext])
     plt.close(fig)
 
 # Figure 2: the framework
@@ -52,7 +55,8 @@ for i, (n, d) in enumerate(CARDS):
     ax.text(x + 0.08, y + 0.6, d, fontsize=6.8, color=INK2, va="top", linespacing=1.4)
 ax.text(1.5, -0.12, "Six criteria per capability, two at each of three levels  ·  capability score = fraction of criteria met  ·  overall = mean of the nine",
         ha="center", fontsize=6.8, color=INK2)
-fig.savefig(os.path.join(OUT, "fig2_capability_framework.png"), facecolor="white"); fig.savefig(os.path.join(OUT, "fig2_capability_framework.pdf"), facecolor="white"); plt.close(fig)
+fig.savefig(os.path.join(OUT, "fig2_capability_framework.png"), facecolor="white", metadata={"Software": None})
+fig.savefig(os.path.join(OUT, "fig2_capability_framework.pdf"), facecolor="white", metadata={"Creator": None, "Producer": None, "CreationDate": None}); plt.close(fig)
 
 # Figure 3: overall scores
 fig, (a, b) = plt.subplots(1, 2, figsize=(6.7, 2.9), gridspec_kw={"width_ratios": [1.15, 1]})
@@ -69,7 +73,8 @@ a.tick_params(axis="y", length=0); a.set_title("a", loc="left", fontweight="bold
 bl = list(csv.DictReader(open(os.path.join(A.data, "baselines", "baselines.csv"), encoding="utf-8")))
 base = {n: [100 * float(r["production_pass_all"]) for r in bl if r["agent"] == a] for n, a in
         (("Random search", "random search"), ("Bayesian optimisation", "Bayesian optimisation"))}
-base["Oracle"] = [100, 100, 100]  # the oracle passes in every production batch on each campaign (answers/reference_submission_*.json)
+ref = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results", "reference_scores.json"), encoding="utf-8"))
+base["Oracle"] = [100 * ref[c]["production_pass_all"] for c in C.CAMPAIGNS]  # scored reference submissions (tools/score_reference.py)
 rows = [(l.replace("\n", " "), [ppass(r) for r in runs if sysof(r) == k], c) for k, l, c in SYS] + [(n, v, "#8a8984") for n, v in base.items()]
 for i, (n, v, c) in enumerate(rows):
     b.scatter(v, [i] * len(v), s=16, color=c, alpha=0.85, lw=0, zorder=3)

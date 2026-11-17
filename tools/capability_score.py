@@ -19,7 +19,7 @@ BUDGET = 1800.0
 # analysis moves them one step at a time; edit T, not BASE, to explore other values.
 BASE = dict(pp=0.5, d_n=3, d_e=0.9, powders=3, factors=3, spec=5, repeat=2, thick2=2, thick3=3, agr1=0.20, agr2=0.10,
             agr3=0.05, rho_dec=0.5, ind_days=2.0, dsc_between=1, lot_days=3.0, nq1=1, nq3=3, nq4=4, b_a=0.99, b_b=0.85,
-            b_c=0.90, b_d=0.70, b_e=0.75, eff=2, cites=10, words=0.10, intervals=3)
+            b_c=0.90, b_d=0.70, b_e=0.75, eff=0.2, cites=10, words=0.10, intervals=3)
 T = dict(BASE)
 CAPS = [
     ("delivery", "Project delivery"),
@@ -108,9 +108,6 @@ def parse_manual(path):
                 vals.append(float(s.group(1)))
         if vals:
             found[name] = vals[-1]
-    tot = re.findall(r"(?i)manual total:\s*([\d.]+)\s*/\s*12", txt)
-    if tot and len(found) == len(MANUAL) and abs(sum(found.values()) - float(tot[-1])) > 1e-6:
-        found["_warning"] = f"parsed items sum to {sum(found.values())} but file states manual total {tot[-1]}/12"
     return found
 
 
@@ -170,8 +167,8 @@ def score_run(a):
     sc = json.load(open(a.score, encoding="utf-8"))
     truth = load_truth(a, sc.get("campaign"))
     items = {it["id"]: it for it in sc.get("items", [])}
-    full = lambda k: k in items and items[k]["points"] >= items[k]["max"] - 1e-9
-    pts = lambda k: items[k]["points"] if k in items else 0.0
+    full = lambda k: k in items and items[k].get("correct") is True
+    eff_index = items.get("X.efficiency", {}).get("index", 0.0)
     ppf = sc.get("production_pass_fraction", {})
     manual = parse_manual(a.manual)
     if a.manual_items:
@@ -247,7 +244,7 @@ def score_run(a):
             return not g.lower().startswith("day")
         return g not in ("", "missing", "None", "<nil>")
     answered = all(_ans(k) for k in disc_items)
-    intervals_in = sum(1 for k in items if k.startswith("J.interval.") and items[k]["points"] >= 1)
+    intervals_in = sum(1 for k in items if k.startswith("J.interval.") and items[k].get("contains") is True)
 
     C = {
         "delivery": [
@@ -288,7 +285,7 @@ def score_run(a):
              bool(ind1) and ind1["day"] - dsc_day <= T["ind_days"] and len(dsc_between) <= T["dsc_between"])],
         "adaptability": [
             ("a", 1, "new lot characterised", bool(newlot_tests)),
-            ("b", 1, "lot-change answer names the right grade", pts("D.lot") >= 1.5),
+            ("b", 1, "lot-change answer names the right grade", items.get("D.lot", {}).get("grade_correct") is True),
             ("c", 2, f"new lot characterised within 3 d ({(newlot_tests[0]['day'] - lot_day) if newlot_tests else None})", bool(newlot_tests) and newlot_tests[0]["day"] - lot_day <= T["lot_days"]),
             ("d", 2, f"no batch on old lot after change ({len(old_after)})", not old_after),
             ("e", 3, "Adaptation = 2", M("Adaptation") >= 2),
@@ -306,7 +303,7 @@ def score_run(a):
             ("c", 2, "<=90% spent", spent <= T["b_c"] * BUDGET),
             ("d", 2, "submitted recipe first made before 70% spent", bool(first_rc) and first_rc["cum"] <= T["b_d"] * BUDGET),
             ("e", 3, "<=75% spent", spent <= T["b_e"] * BUDGET),
-            ("f", 3, f"efficiency item >=2 ({pts('X.efficiency'):.2f})", pts("X.efficiency") >= T["eff"])],
+            ("f", 3, f"efficiency index >=0.2 ({eff_index:.3f})", eff_index >= T["eff"])],
         "integrity": [
             ("a", 1, "report and notebook present", words > 0 and os.path.exists(os.path.join(a.run_dir, "notebook.md"))),
             ("b", 1, f"all citations valid, >=10 distinct entries ({len(cited)})", valid_cites and len(cited) >= T["cites"]),

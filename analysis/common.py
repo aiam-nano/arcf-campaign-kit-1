@@ -39,5 +39,16 @@ def campaign_of(run_id):
     return run_id.rsplit("_", 1)[1][0]
 
 
+def column(name):
+    """The runs.csv column of a capability: its name in lower case with underscores."""
+    return name.lower().replace(" ", "_")
+
+
 def runs(data):
-    return list(csv.DictReader(open(os.path.join(data, "runs.csv"), encoding="utf-8")))
+    """The rows of runs.csv, with each capability score also available under its short key."""
+    rows = list(csv.DictReader(open(os.path.join(data, "runs.csv"), encoding="utf-8")))
+    for r in rows:
+        for k, name in CAPS:
+            if column(name) in r:
+                r[k] = r[column(name)]
+    return rows
